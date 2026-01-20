@@ -1,0 +1,44 @@
+# STEP 1: Import required libraries
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+
+# STEP 2: Load dataset
+df = pd.read_csv("https://raw.githubusercontent.com/selva86/datasets/master/AdultUCI.csv")
+
+# STEP 3: Basic overview
+print("Dataset shape:", df.shape)
+df.info()
+
+# STEP 4: Identify categorical and numerical features
+cat_cols = df.select_dtypes(include='object').columns
+num_cols = df.select_dtypes(include=['int64', 'float64']).columns
+
+print("\nCategorical Columns:")
+print(cat_cols)
+
+print("\nNumerical Columns:")
+print(num_cols)
+
+# STEP 5: Label Encoding (where order exists)
+# Target variable
+le = LabelEncoder()
+df['income'] = le.fit_transform(df['income'])
+
+# STEP 6: One-Hot Encoding (no order)
+df_encoded = pd.get_dummies(df, columns=cat_cols.drop('income'), drop_first=True)
+
+print("\nDataset shape after encoding:", df_encoded.shape)
+
+# STEP 7: Feature Scaling
+scaler = StandardScaler()
+df_encoded[num_cols] = scaler.fit_transform(df_encoded[num_cols])
+
+# STEP 8: Final dataset check
+print("\nFinal dataset info:")
+df_encoded.info()
+
+# STEP 9: Save processed dataset
+df_encoded.to_csv("processed_adult_income.csv", index=False)
+
+print("\nProcessed dataset saved as 'processed_adult_income.csv'")
